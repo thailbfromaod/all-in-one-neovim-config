@@ -6,6 +6,7 @@ vim.opt.relativenumber = true
 vim.opt.tabstop = 4
 vim.opt.expandtab = true
 vim.opt.shiftwidth = 0
+vim.opt.clipboard = "unnamedplus"
 
 -- Tab navigation with wrap-around
 vim.keymap.set("n", "<leader>]", function()
@@ -87,7 +88,7 @@ require("lazy").setup(
         },
         -- Theme
         {
-            "savq/melange-nvim"
+            "rebelot/kanagawa.nvim"
         },
         -- === COMPLETION: nvim-cmp ===
         {
@@ -323,4 +324,4 @@ vim.diagnostic.config({
   }
 })
 
-vim.cmd.colorscheme 'melange'
+vim.cmd("colorscheme kanagawa")
