@@ -23,6 +23,12 @@ vim.keymap.set("n", "<leader>[", function()
     vim.api.nvim_set_current_tabpage(tabs[prev_idx])
 end, { desc = "Previous Tab (Wrap)" })
 
+vim.keymap.set("n", "<leader>gvh", ":Gitsigns preview_hunk_inline<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>gnh", ":Gitsigns nav_hunk next<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>gph", ":Gitsigns nav_hunk prev<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>gsh", ":Gitsigns stage_hunk<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>guh", ":Gitsigns reset_hunk<CR>", { noremap = true })
+
 -- Lazy.nvim bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -62,7 +68,7 @@ require("lazy").setup(
                     },
                     sections = {
                         lualine_a = { "mode" },
-                        lualine_b = { "branch", "diff" },
+                        lualine_b = { "branch" },
                         lualine_c = {
                             {
                                 "filename",
@@ -80,7 +86,22 @@ require("lazy").setup(
                         lualine_x = {
                             "encoding",
                             "fileformat",
-                            "filetype"
+                            "filetype",
+                            {
+                                "diff",
+                                source = function()
+                                    local gitsigns = vim.b.gitsigns_status_dict
+                                    if gitsigns then
+                                        return {
+                                            added = gitsigns.added,
+                                            modified = gitsigns.changed,
+                                            removed = gitsigns.removed,
+                                        }
+                                    end
+                                end,
+                                colored = true,
+                                symbols = {added = "+", modified = "~", removed = "-"}
+                            }
                         }
                     }
                 })
@@ -238,6 +259,9 @@ require("lazy").setup(
         {
             "sphamba/smear-cursor.nvim",
             opts = {},
+        },
+        {
+            "lewis6991/gitsigns.nvim",
         }
     }
 )
