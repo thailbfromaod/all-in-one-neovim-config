@@ -122,8 +122,27 @@ require("lazy").setup(
                 appearance = {
                     nerd_font_variant = "mono",
                 },
-                completion = { documentation = { auto_show = true } },
-                signature = { enabled = true },
+                completion = {
+                    list = {
+                        selection = { preselect = false, auto_insert = true } 
+                    },
+                    documentation = { window = { border = "rounded" } },
+                    menu = {
+                        draw = {
+                            treesitter = { "lsp" },
+                            columns = {
+                                { "kind_icon", "label", "label_description", gap = 1 }, { "source_name", gap = 1 }
+                            },
+                        },
+                    },
+                },
+                signature = {
+                    window = {
+                        border = "rounded",
+                        show_documentation = false
+                    },
+                    enabled = true
+                },
                 sources = {
                     default = { "lsp", "path", "snippets", "buffer" }
                 },
@@ -297,10 +316,9 @@ vim.diagnostic.config({
 })
 
 vim.cmd("colorscheme kanagawa")
+
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-
 capabilities = vim.tbl_deep_extend('force', capabilities, require('blink.cmp').get_lsp_capabilities({}, false))
-
 capabilities = vim.tbl_deep_extend('force', capabilities, {
   textDocument = {
     foldingRange = {
