@@ -29,6 +29,7 @@ vim.keymap.set("n", "<leader>gph", ":Gitsigns nav_hunk prev<CR>", { noremap = tr
 vim.keymap.set("n", "<leader>gsh", ":Gitsigns stage_hunk<CR>", { noremap = true })
 vim.keymap.set("n", "<leader>guh", ":Gitsigns reset_hunk<CR>", { noremap = true })
 
+
 -- Lazy.nvim bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -113,74 +114,22 @@ require("lazy").setup(
         },
         -- === COMPLETION: nvim-cmp ===
         {
-            "hrsh7th/nvim-cmp",
-            event = "InsertEnter",
-            dependencies = {
-                "hrsh7th/cmp-nvim-lsp",
-                "hrsh7th/cmp-buffer",
-                "hrsh7th/cmp-path"
+            'saghen/blink.cmp',
+            dependencies = { 'rafamadriz/friendly-snippets' },
+            version = '1.*',
+            opts = {
+                keymap = { preset = 'default' },
+                appearance = {
+                    nerd_font_variant = "mono",
+                },
+                completion = { documentation = { auto_show = true } },
+                signature = { enabled = true },
+                sources = {
+                    default = { "lsp", "path", "snippets", "buffer" }
+                },
+                fuzzy = { implementation = "prefer_rust_with_warning" }
             },
-            config = function()
-                local cmp = require("cmp")
-
-                cmp.setup(
-                    {
-                        sources = {
-                            {name = "nvim_lsp"},
-                            {name = "buffer"},
-                            {name = "path"}
-                        },
-                        window = {
-                            completion = cmp.config.window.bordered(),
-                            documentation = cmp.config.window.bordered(
-                                {
-                                    winhighlight = "Normal:Normal,FloatBorder:CmpDocumentationBorder,CursorLine:CmpDocumentationCursorLine,Search:None",
-                                    border = "rounded",
-                                    max_width = 80,
-                                    max_height = 20
-                                }
-                            )
-                        },
-                        mapping = cmp.mapping.preset.insert(
-                            {
-                                ["<C-Space>"] = cmp.mapping.complete(),
-                                ["<CR>"] = cmp.mapping.confirm({select = false}),
-                                ["<Tab>"] = cmp.mapping(
-                                    function(fallback)
-                                        if cmp.visible() then
-                                            cmp.select_next_item()
-                                        else
-                                            fallback()
-                                        end
-                                    end,
-                                    {"i", "s"}
-                                ),
-                                ["<S-Tab>"] = cmp.mapping(
-                                    function(fallback)
-                                        if cmp.visible() then
-                                            cmp.select_prev_item()
-                                        else
-                                            fallback()
-                                        end
-                                    end,
-                                    {"i", "s"}
-                                )
-                            }
-                        ),
-                        formatting = {
-                            format = function(entry, item)
-                                item.menu =
-                                    ({
-                                    nvim_lsp = "[LSP]",
-                                    buffer = "[Buf]",
-                                    path = "[Path]"
-                                })[entry.source.name]
-                                return item
-                            end
-                        }
-                    }
-                )
-            end
+            opts_extend = { "sources.default" }
         },
         {
             "nvim-treesitter/nvim-treesitter",
@@ -268,13 +217,12 @@ require("lazy").setup(
 
 -- === LSP CONFIG (NeoVim 0.11 Style) ===
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
 -- Define basedpyright config using vim.lsp.config
 vim.lsp.config(
-    "ty",
+    "pylsp",
     {
-        cmd = {"ty", "server"},
+        cmd = {"pylsp"},
         filetypes = {"python"},
         root_markers = {"pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile", "pyrightconfig.json", ".venv"},
         settings = {
@@ -301,7 +249,7 @@ vim.lsp.config(
 )
 
 -- Enable the LSP
-vim.lsp.enable({"ty"})
+vim.lsp.enable({"pylsp"})
 
 vim.api.nvim_set_hl(0, "CmpDocumentationBorder", {fg = "#555555", bg = "none"})
 vim.api.nvim_set_hl(0, "CmpDocumentationCursorLine", {bg = "#2a2a2a"})
@@ -349,3 +297,15 @@ vim.diagnostic.config({
 })
 
 vim.cmd("colorscheme kanagawa")
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+capabilities = vim.tbl_deep_extend('force', capabilities, require('blink.cmp').get_lsp_capabilities({}, false))
+
+capabilities = vim.tbl_deep_extend('force', capabilities, {
+  textDocument = {
+    foldingRange = {
+      dynamicRegistration = false,
+      lineFoldingOnly = true
+    }
+  }
+})
