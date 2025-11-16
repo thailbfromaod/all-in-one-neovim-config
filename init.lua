@@ -146,7 +146,7 @@ require("lazy").setup(
                 sources = {
                     default = { "lsp", "path", "snippets", "buffer" }
                 },
-                fuzzy = { implementation = "prefer_rust_with_warning" }
+                fuzzy = { implementation = "rust" }
             },
             opts_extend = { "sources.default" }
         },
@@ -245,6 +245,18 @@ vim.lsp.config(
         filetypes = {"python"},
         root_markers = {"pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile", "pyrightconfig.json", ".venv"},
         settings = {
+            pylsp = {
+                plugins = {
+                    jedi_completion = {
+                        fuzzy = true,
+                        include_params = true,
+                    },
+                    pylsp_mypy = {
+                        enabled = true,
+                        live_mode = true,
+                    },
+                },
+            },
             python = {
                 analysis = {
                     autoSearchPaths = true,
